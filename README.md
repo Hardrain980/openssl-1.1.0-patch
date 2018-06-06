@@ -8,16 +8,34 @@ Based on client's SSL cipher sequence.
 
 ## How to use:
 
-0. Download the 4 files in the patch
-0. Replace the corresponding in the OpenSSL 1.1.0 source as directed:
-  0. `ssl_conf.c` and `s3_lib.c` are in `{openssl_source}/ssl/`
-  0. `apps.h` is in `{openssl_source}/apps/`
-  0. `ssl.h` is in `{openssl_source}/include/openssl/`
-0. Compile, don't forgot told `ld` where the shared libraries are with `--Wl,rpath=`
-0. Install
-0. Recompile other Apps depends on OpenSSL 1.1.0, use `--Wl,rpath=` to link the libraries you just compiled.
+### Apply patch for OpenSSL:
+
+```
+cd ~
+
+curl -O https://www.openssl.org/source/openssl-1.1.0h.tar.gz
+curl https://www.openssl.org/source/openssl-1.1.0h.tar.gz.sha256
+sha256sum https://www.openssl.org/source/openssl-1.1.0h.tar.gz
+## Compare the digest, check the integrity of the source code.
+
+tar -zxvf openssl-1.1.0h.tar.gz
+cd openssl-1.1.0h/
+
+patch -p1 < ../chacha_priority.patch
+## Assume the patch file is in your home directory(~)
+
+## Assign a directory to avoid the system version of OpenSSL being covered,
+## Which may leads to unexpected result.
+./config --prefix={install_path} --openssldir=/etc/ssl --Wl,rpath={install_path}/lib
+make -j
+make install
+```
+
+### Use with applications depend on OpenSSL:
+
+0. Recompile other Apps depends on OpenSSL 1.1.0, add `LDFLAGS="--Wl,rpath={install_path}/lib"` to use the libraries you just compiled.
 0. Use OpenSSL config command `Options:+PrioritizeChaCha` to enable this feature
-0. Don't set CHACHA20-POLY1305 ciphersuites as the first one. (It would interfere this feature.)
+0. Do _NOT_ set CHACHA ciphersuites as the first one. (Which will make chacha _ALWAYS_ be the first alternative)
 
 Example configuration for Apache 2.4:
 ```
