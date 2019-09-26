@@ -1,5 +1,11 @@
 # OpenSSL-1.1.0 Patch
 
+## Update 2019.09.26
+
+According to [openssl.org](https://www.openssl.org/source/), OpenSSL 1.1.0 branch no longer receives any update from Sept 11, 2019, the user should upgrade to 1.1.1 branch.
+
+This patch will be archived from now on.
+
 ## What would it do
 
 Make the CHACHA20-POLY1305 ciphersuites the first option on those devices without AES instruction-sets.
